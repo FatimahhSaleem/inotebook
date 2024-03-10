@@ -5,13 +5,13 @@
   "main": "index.js",
   "scripts": {
     "start": "react-scripts start",
-
     "test": "echo \"Error: no test specified\" && exit 1",
-    "both": "npm run start && nodemon backend/index.js" 
+    "both": "npm run start && nodemon backend/index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "cors": "^2.8.5"
   }
 }
