@@ -17,11 +17,12 @@ router.post ('/createuser',[
     body('email',"Enter a valid email").isEmail(),
     body('password',"Password should be atleast 5 charcters").isLength({ min: 5 })
 ],async (req, res) => {
+    let success=false;
 
     //If there are errors return the bad request and the error
     const errors =validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ success,errors: errors.array() });
     }
   
    
@@ -29,7 +30,7 @@ router.post ('/createuser',[
 //    Check if the user with this email already exists
 let existingUser = await User.findOne({ email: req.body.email });
 if (existingUser) {
-  return res.status(400).json({ error: 'Email already exists' });
+  return res.status(400).json({success, error: 'Email already exists' });
 }
 
 
@@ -58,7 +59,8 @@ try {
   const authtoken=jwt.sign(data,JWT_SECRET)
 
   // Respond with the created user
-  res.json({authtoken});
+  success=true
+  res.json({success,authtoken});
 
 } catch (error) {
   if (error.code === 11000) {
@@ -77,11 +79,11 @@ router.post ('/login',[
   body('email',"Enter a valid email").isEmail(),
   body('password',"Password can't be blank").exists()
 ],async (req, res) => {
-
+  let success=false;
   //If there are errors return the bad request and the error
   const errors =validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    return res.status(400).json({ success,errors: errors.array() });
   }
   const {email,password}=req.body;
   try {
@@ -89,12 +91,12 @@ router.post ('/login',[
 //    Check if the user with this email already exists
       let user = await User.findOne({ email});
       if (!user) {
-        return res.status(400).json({ error: 'Login with correct credentials' });
+        return res.status(400).json({success, error: 'Login with correct credentials' });
       }
 
       let passwordCompare = await bcrypt.compare( password, user.password);
       if (!passwordCompare) {
-        return res.status(400).json({ error: 'Login with correct credentials' });
+        return res.status(400).json({success, error: 'Login with correct credentials' });
       }
       const data={
         user:{
@@ -103,7 +105,8 @@ router.post ('/login',[
       }
       const authtoken=jwt.sign(data, JWT_SECRET)
       // Respond with the created user
-      res.json({authtoken});
+      success=true
+      res.json({success,authtoken});
   } catch (error) {
     
     console.error(error.message);
@@ -112,7 +115,7 @@ router.post ('/login',[
 })
 
 
-// Route 3 : Get loggedin user details using :GET "/api/auth/getuser".Login required.
+// Route 3 : Get loggedin users details using :GET "/api/auth/getuser".Login required.
 
 router.get ('/getuser',fetchuser ,async (req, res) => {
 
